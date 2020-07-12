@@ -1,0 +1,100 @@
+void
+bubble_sort(Record records[], int num_records)
+{
+    /*
+    ** This code was adapted from that in provided in 
+    ** "Programming, Problem Solving and Abstraction with C"
+    ** by Alistair Moffat.
+    **
+    ** Unlike the pseudocode provided in Section 3.1 of Levitin,
+    ** this implementation performs better on almost sorted files.
+    **
+    */
+    int didswaps = 1;
+    int i;
+    
+    while (didswaps)
+    {
+        didswaps = 0;
+        for (i = 0; i < num_records - 1; i++)
+        {
+            if (compare_records(&records[i], &records[i + 1]) > 0)
+            {
+                swap_records(&records[i], &records[i + 1]);
+                didswaps = 1;
+            }
+        }
+	
+     }
+}    
+
+void
+selection_sort(Record records[], int num_records)
+{
+    /*These two variables are used for iterations purpose*/
+	int i;
+	int j;
+
+	int min;
+
+    /* Basically what selection sort does is to search through
+    ** entire array initially, and find the smallest value
+    ** swapping it with the value at the front of the array
+    ** then repeat the same thing for the remaining array
+    ** (excluding the smallest value that has been swapped)
+    */
+
+	for (i = 0 ; i < num_records - 1 ; i++) {
+	min = i;
+        
+        /* This loop is to find the minimum value of the array */ 
+		for (j=i+1; j < num_records ; j++) {
+            if (compare_records(&records[j] ,&records[min]) < 0) 
+            {	
+				min = j;
+			}
+		}
+
+        /* Finally after we find it , swap it with the value of the
+        ** front array and repeat the iteration for the remaining
+        ** array
+        */
+		swap_records(&records[i],&records[min]);
+	}
+}
+		
+
+static void
+insertion_sort(Record records[], int num_records)
+{
+	Record v;
+	int i;
+	int j;
+
+
+    /* Basically what insertion sort does is to 
+    ** scan the array of all the values
+    ** from left end of the array and insert each 
+    ** element encountered into its correct position 
+    */
+ 
+	for (i = 1 ; i < num_records ; i++) 
+	{
+        /* This variable v is used to help the comparison */
+		v = records[i];
+		j = i-1;
+
+        /* And this is basically how the insert function is 
+        ** implemented, 
+        */
+
+		while (j>=0 && (compare_records(&records[j] , &v) > 0) ) {
+			records[j+1] = records [j];
+			j = j-1;
+		}
+		records[j+1] = v; 
+	}
+		
+	
+}
+

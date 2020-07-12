@@ -1,0 +1,245 @@
+static int partition(Record A[], size_t num_records);
+static void Merge(Record B[], size_t p, Record C[], size_t q, Record A[]);
+/*
+** Compares two records.  Returns an integer < 0 if
+** a < b, ==0 if a == b and > 0 if a > b.  This function
+** also increments the global variable 'number_of_comparisons'.
+**
+** NOTE: we pass pointers to the records rather than passing then by value.
+*/
+static int compare_records(Record *a,  Record *b);
+
+/*
+** This version is for use with the standard library's qsort function.
+*/
+static int compare_records_for_qsort(const void *a, const void *b);
+
+/*
+** Swap the contents of the two records.
+*/
+static void swap_records(Record *a, Record *b);
+
+/*
+** Test if the array of records is sorted.
+** Returns true if the array is sorted, false otherwise.
+*/
+static int test_if_sorted(Record records[], size_t num_records);
+
+/*
+** Test if the sort was stable.
+** It does this by using the 'value' field in the structure.   
+** Returns true if this is the case or false otherwise.
+*/
+static int test_if_stable(Record records[], size_t num_records);
+
+/*
+** Read a sequence of integers from stdin and place them in an array of
+** Records.  Associate a number with each integer that records which
+** number is read in.
+*/
+static size_t read_records(Record records[]);
+
+/*
+** Print the array of records.
+*/
+static void print_records(Record records[], size_t num_records);
+
+/*
+** Print out a usage message to stderr and aborts execution.
+*/
+static void usage(const char *prog_name);
+
+static void *safe_malloc(size_t size);
+
+
+void
+libsort(Record records[], size_t num_records)
+{
+	qsort(records, num_records, sizeof(Record),
+		compare_records_for_qsort);
+}
+
+/* The basic quicksort function basically recursively separates
+** the array correspondingly to the pivot and sort them again 
+** recursively 
+** note that in this implementation the quicksort only works
+** if the pivot is chosen to be the first element of the array
+*/
+
+void
+basic_quicksort (Record records[], size_t num_records)
+{
+int s;	
+	if (num_records > 1)
+	{
+    /* Choose the pivot using partition function and also
+    ** the partition function will put the pivot in the correct
+    ** place in the array 
+    */
+
+	s = partition(records, num_records);
+    /* quicksort the array before the pivot */
+	basic_quicksort(records,s);
+    /* quicksort the array after the pivot */
+	basic_quicksort(&records[s+1],(num_records-(s+1)));
+	}
+}
+
+/* This is how the partition function is implemented 
+** Note that this quick sort only works if the pivot 
+** is chosen to be the first element of the array
+*/
+
+/* This partition function also places the pivot
+** into its final correct position in the array
+** with necessary comparisons
+*/
+
+int
+partition (Record A[], size_t num_records)
+{
+Record p = A[0];
+int i = 0;
+int j = num_records;
+
+do
+{
+	do
+	{
+		i = i+1;
+	}
+	while (compare_records(&A[i],&p) < 0);
+
+	do 
+	{
+		j = j-1;
+	}
+	while (compare_records (&A[j],&p) > 0);
+    swap_records(&A[i],&A[j]);
+} while (i<j);
+
+/* undo last swap when i = j */
+swap_records(&A[i],&A[j]);
+/* swap the pivot into its correct position */
+swap_records(&A[0],&A[j]);
+return j;
+}
+	
+
+/* Basically what mergesort function does is to break the array 
+** recursively into two halves until the array consists only of 
+** one element and sort both of them separately
+** Then merge and sort 
+** the two sorted arrays into a single sorted one
+** Note that the merging and sorting part will also be done
+** recursively until all broken arrays are merged and 
+** already sorted
+*/
+
+void
+basic_mergesort(Record records[], size_t num_records)
+{
+	int i;
+
+    /* Initialize two records to be the temporary 
+    ** storage of the data in the initially provided array
+    ** each with size = half of the num_records
+    */
+ 
+	Record *B;
+	Record *C;
+	int lenB = num_records/2;
+	int lenC = num_records - lenB;
+
+	B=(Record *) safe_malloc((lenB) * sizeof (Record));
+	C=(Record *) safe_malloc((lenC) * sizeof (Record));
+
+	if (num_records > 1)
+	{
+		for ( i = 0 ; i < lenB ; i++) {
+			B[i] = records[i];
+		}
+		
+		for ( i = lenB ; i < num_records ; i++) {
+			C[i-(num_records/2)] = records[i];
+		}
+
+    /* Sort the first half */
+		basic_mergesort (B,lenB);
+    /* Sort the other half*/
+		basic_mergesort (C,lenC);
+
+    /* Go to merge function to combine and sort the two arrays 
+    ** into a single sorted one
+    */
+		Merge(B,lenB,C,lenC,records);
+	}
+
+    /* Free the two temporary arrays */
+    free (B);
+    free (C);
+}
+
+/* This is how the merge function is implemented*/
+/* It merges two arrays i.e. B and C and sort them
+** and store them in array A ( array records in the caller case)
+*/
+ 
+void
+Merge(Record B[], size_t p,Record C[],size_t q ,Record A[])
+{
+	int i = 0;
+	int j = 0;
+	int k = 0;
+	int iteration = 0;
+	int iteration2;
+
+    /* Compare data from both arrays (B and C) and
+    ** store them in array A / array records (in the caller case)
+    ** in the correct position
+    */
+
+	while (i < p && j < q) 
+	{
+		if (compare_records(&B[i],&C[j]) <= 0) 
+		{
+			A[k] = B[i];
+			i = i+1;
+		}
+		else
+		{
+			A[k] = C[j];
+			j = j+1;
+		}
+		k++;
+	}
+
+    /* If one of the arrays (i.e. B or C) for example
+    ** array B has no more
+    ** data to be compared, then the remaining items in
+    ** the array C will then be copied in the back of 
+    ** the array A / array records (in the case of the caller)
+    */
+	
+    iteration2 = k;
+	if ( i == p) 
+	{
+		for ( iteration = j; iteration < q ; iteration++) 
+		{
+			A[iteration2] = C[iteration];
+			iteration2 ++;
+		}
+	}
+	else
+	{
+		for (iteration = i; iteration < p ; iteration++)
+		{
+			A[iteration2] = B[iteration];
+			iteration2++;
+		}
+	}
+}
+
+
+
+                

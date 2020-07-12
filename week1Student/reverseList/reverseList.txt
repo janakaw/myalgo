@@ -1,0 +1,8 @@
+Use the reverseList.c file defining the "reverseList" function.
+
+Your "reverseList" function should find the reverse list of a given list.
+
+Once you define the "reverseList" function, use makefile to compile the files and test using the input file
+
+# make
+# ./reverseList input

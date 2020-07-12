@@ -1,0 +1,9 @@
+Write your code in merge.c only!
+
+You have to write the code for two functions, that use linked lists for storing the array.
+
+Once you have the functions, just use “make” to compile and test with the input fillies:
+
+$ make
+$ ./mergeArray input
+$ ./mergeArray input2

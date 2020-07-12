@@ -1,0 +1,26 @@
+# Makefile for stack exercise
+# udaya
+#July2011
+
+HDRS = stack.h  
+
+COM_SCRS = stack.c 
+COM_OBJS = stack.o
+
+STK_SCRS = stack_main.c 
+STK_OBJS = stack_main.o
+
+B_SCRS = postfix_main.c 
+B_OBJS = postfix_main.o
+
+CC = gnuc 
+CFLAGS= -g -O0
+all: STAK B 
+
+STAK: $(COM_OBJS) $(STK_OBJS)
+	$(CC)$(CFLAGS) -o STAK $(COM_OBJS) $(STK_OBJS)
+
+B: $(COM_OBJS) $(B_OBJS)
+	$(CC)$(CFLAGS) -o B $(COM_OBJS) $(B_OBJS)
+clean:
+	/bin/rm -f STAK $(COM_OBJS) $(STK_OBJS) $(B_OBJS)

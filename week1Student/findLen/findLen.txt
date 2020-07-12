@@ -1,0 +1,8 @@
+Use the findLen.c file defining the "findLen" function.
+
+Your "findLen" function should find the length of the list.
+
+Once you define the "findLen" function, use makefile to compile the files and test using the input file
+
+# make
+# ./findLength input

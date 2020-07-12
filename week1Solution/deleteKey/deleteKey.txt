@@ -1,0 +1,8 @@
+Use the main.c file as a guideline for defining the "delete key" function in del_key.c
+
+Your "delete key" function should remove the first element in the list.
+
+Once you define the "delete key" function, use makefile to compile the files and test using the input file
+
+# make
+# ./deleteKey input
